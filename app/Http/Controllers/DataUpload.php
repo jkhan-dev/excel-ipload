@@ -6,7 +6,7 @@ use App\Imports\EmployeesImport;
 use App\Models\employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Http\Response;
 class DataUpload extends Controller
 {
    public function upload_data(Request $request){
@@ -53,12 +53,23 @@ class DataUpload extends Controller
         }
         if(isset($requested_params['sort_by_hire_date']))
         {
-
-            $employees = $employees->sortBy(function ($employee) {
-                return strtotime($employee->hire_date);
-            });
+            $employees = $employees->sortByDesc('hire_date');
+            
         }
-        return $employees->all();
-        
+            // Convert the collection to an array
+        $employeesArray = $employees->toArray();
+
+        // Create the API response
+        $responseData = [
+            'success' => true,
+            'message' => 'Data retrieved successfully',
+            'data' => $employeesArray
+        ];
+
+        // Set the HTTP status code for the response
+        $statusCode = 200;
+
+        // Return the API response as JSON
+        return response()->json($responseData, $statusCode);
     }
 }
